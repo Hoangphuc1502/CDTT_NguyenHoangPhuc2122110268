@@ -1,8 +1,18 @@
-import React, { Fragment, createContext, useReducer } from "react";
+"use client";
+
+import React, {
+  Fragment,
+  createContext,
+  useReducer,
+} from "react";
+
 import AdminLayout from "../layout";
 import DashboardCard from "./DashboardCard";
 import Customize from "./Customize";
-import { dashboardState, dashboardReducer } from "./DashboardContext";
+import {
+  dashboardState,
+  dashboardReducer,
+} from "./DashboardContext";
 import TodaySell from "./TodaySell";
 
 export const DashboardContext = createContext();
@@ -17,14 +27,18 @@ const DashboardComponent = () => {
   );
 };
 
-const DashboardAdmin = (props) => {
-  const [data, dispatch] = useReducer(dashboardReducer, dashboardState);
+const DashboardAdmin = () => {
+  const [data, dispatch] = useReducer(
+    dashboardReducer,
+    dashboardState
+  );
+
   return (
-    <Fragment>
-      <DashboardContext.Provider value={{ data, dispatch }}>
-        <AdminLayout children={<DashboardComponent />} />
-      </DashboardContext.Provider>
-    </Fragment>
+    <DashboardContext.Provider value={{ data, dispatch }}>
+      <AdminLayout>
+        <DashboardComponent />
+      </AdminLayout>
+    </DashboardContext.Provider>
   );
 };
 

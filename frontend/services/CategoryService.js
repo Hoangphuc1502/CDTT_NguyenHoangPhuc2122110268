@@ -2,33 +2,106 @@ import axios from "axios";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
+const getHeaders = () => {
+  if (typeof window === "undefined") {
+    return {};
+  }
+
+  const jwt = localStorage.getItem("jwt");
+
+  if (!jwt) {
+    return {};
+  }
+
+  const token = JSON.parse(jwt)?.token;
+
+  return {
+    headers: {
+      token: `Bearer ${token}`,
+    },
+  };
+};
+
 const CategoryService = {
-  getAll: async () => {
-    const response = await axios.get(`${API_URL}/categories`);
-    return response.data;
+  // Lấy tất cả category
+  getAllCategory: async () => {
+    try {
+      const response = await axios.get(
+        `${API_URL}/api/category/all-category`,
+        getHeaders()
+      );
+
+      return response.data;
+    } catch (error) {
+      console.error("Get all category error:", error);
+      throw error;
+    }
   },
 
-  getById: async (id) => {
-    const response = await axios.get(`${API_URL}/categories/${id}`);
-    return response.data;
+  // Thêm category
+  createCategory: async ({
+    cName,
+    cImage,
+    cDescription,
+    cStatus,
+  }) => {
+    const formData = new FormData();
+
+    formData.append("cImage", cImage);
+    formData.append("cName", cName);
+    formData.append("cDescription", cDescription);
+    formData.append("cStatus", cStatus);
+
+    try {
+      const response = await axios.post(
+        `${API_URL}/api/category/add-category`,
+        formData,
+        getHeaders()
+      );
+
+      return response.data;
+    } catch (error) {
+      console.error("Create category error:", error);
+      throw error;
+    }
   },
 
-  create: async (data) => {
-    const response = await axios.post(`${API_URL}/categories`, data);
-    return response.data;
+  // Sửa category
+  editCategory: async (cId, des, status) => {
+    const data = {
+      cId,
+      cDescription: des,
+      cStatus: status,
+    };
+
+    try {
+      const response = await axios.post(
+        `${API_URL}/api/category/edit-category`,
+        data,
+        getHeaders()
+      );
+
+      return response.data;
+    } catch (error) {
+      console.error("Edit category error:", error);
+      throw error;
+    }
   },
 
-  update: async (id, data) => {
-    const response = await axios.put(
-      `${API_URL}/categories/${id}`,
-      data
-    );
-    return response.data;
-  },
+  // Xóa category
+  deleteCategory: async (cId) => {
+    try {
+      const response = await axios.post(
+        `${API_URL}/api/category/delete-category`,
+        { cId },
+        getHeaders()
+      );
 
-  delete: async (id) => {
-    const response = await axios.delete(`${API_URL}/categories/${id}`);
-    return response.data;
+      return response.data;
+    } catch (error) {
+      console.error("Delete category error:", error);
+      throw error;
+    }
   },
 };
 

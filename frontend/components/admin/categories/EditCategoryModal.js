@@ -1,8 +1,10 @@
-import React, { Fragment, useContext, useState, useEffect } from "react";
-import { CategoryContext } from "./index";
-import { editCategory, getAllCategory } from "./FetchApi";
+"use client";
 
-const EditCategoryModal = (props) => {
+import React, { Fragment, useContext, useEffect, useState } from "react";
+import { CategoryContext } from "./index";
+import CategoryService from "@/services/CategoryService";
+
+const EditCategoryModal = () => {
   const { data, dispatch } = useContext(CategoryContext);
 
   const [des, setDes] = useState("");
@@ -13,33 +15,53 @@ const EditCategoryModal = (props) => {
     setDes(data.editCategoryModal.des);
     setStatus(data.editCategoryModal.status);
     setCid(data.editCategoryModal.cId);
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data.editCategoryModal.modal]);
+  }, [data.editCategoryModal]);
 
   const fetchData = async () => {
-    let responseData = await getAllCategory();
-    if (responseData.Categories) {
-      dispatch({
-        type: "fetchCategoryAndChangeState",
-        payload: responseData.Categories,
-      });
+    try {
+      const responseData = await CategoryService.getAllCategory();
+
+      if (responseData?.Categories) {
+        dispatch({
+          type: "fetchCategoryAndChangeState",
+          payload: responseData.Categories,
+        });
+      }
+    } catch (error) {
+      console.log(error);
     }
   };
 
   const submitForm = async () => {
-    dispatch({ type: "loading", payload: true });
-    let edit = await editCategory(cId, des, status);
-    if (edit.error) {
-      console.log(edit.error);
-      dispatch({ type: "loading", payload: false });
-    } else if (edit.success) {
-      console.log(edit.success);
-      dispatch({ type: "editCategoryModalClose" });
-      setTimeout(() => {
-        fetchData();
-        dispatch({ type: "loading", payload: false });
-      }, 1000);
+    dispatch({
+      type: "loading",
+      payload: true,
+    });
+
+    try {
+      const responseData =
+        await CategoryService.editCategory(
+          cId,
+          des,
+          status
+        );
+
+      if (responseData?.success) {
+        dispatch({
+          type: "editCategoryModalClose",
+        });
+
+        await fetchData();
+      } else if (responseData?.error) {
+        console.log(responseData.error);
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      dispatch({
+        type: "loading",
+        payload: false,
+      });
     }
   };
 
@@ -47,28 +69,42 @@ const EditCategoryModal = (props) => {
     <Fragment>
       {/* Black Overlay */}
       <div
-        onClick={(e) => dispatch({ type: "editCategoryModalClose" })}
+        onClick={() =>
+          dispatch({
+            type: "editCategoryModalClose",
+          })
+        }
         className={`${
-          data.editCategoryModal.modal ? "" : "hidden"
+          data.editCategoryModal.modal
+            ? ""
+            : "hidden"
         } fixed top-0 left-0 z-30 w-full h-full bg-black opacity-50`}
       />
-      {/* End Black Overlay */}
 
-      {/* Modal Start */}
+      {/* Modal */}
       <div
         className={`${
-          data.editCategoryModal.modal ? "" : "hidden"
-        } fixed inset-0 m-4  flex items-center z-30 justify-center`}
+          data.editCategoryModal.modal
+            ? ""
+            : "hidden"
+        } fixed inset-0 m-4 flex items-center z-30 justify-center`}
       >
-        <div className="relative bg-white w-11/12 md:w-3/6 shadow-lg flex flex-col items-center space-y-4  overflow-y-auto px-4 py-4 md:px-8">
+        <div className="relative bg-white w-11/12 md:w-3/6 shadow-lg flex flex-col items-center space-y-4 overflow-y-auto px-4 py-4 md:px-8">
+
+          {/* Header */}
           <div className="flex items-center justify-between w-full pt-4">
             <span className="text-left font-semibold text-2xl tracking-wider">
-              Add Category
+              Edit Category
             </span>
-            {/* Close Modal */}
+
+            {/* Close */}
             <span
               style={{ background: "#303031" }}
-              onClick={(e) => dispatch({ type: "editCategoryModalClose" })}
+              onClick={() =>
+                dispatch({
+                  type: "editCategoryModalClose",
+                })
+              }
               className="cursor-pointer text-gray-100 py-2 px-2 rounded-full"
             >
               <svg
@@ -76,7 +112,6 @@ const EditCategoryModal = (props) => {
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
               >
                 <path
                   strokeLinecap="round"
@@ -87,8 +122,13 @@ const EditCategoryModal = (props) => {
               </svg>
             </span>
           </div>
+
+          {/* Description */}
           <div className="flex flex-col space-y-1 w-full">
-            <label htmlFor="description">Category Description</label>
+            <label htmlFor="description">
+              Category Description
+            </label>
+
             <textarea
               value={des}
               onChange={(e) => setDes(e.target.value)}
@@ -99,32 +139,46 @@ const EditCategoryModal = (props) => {
               rows={5}
             />
           </div>
+
+          {/* Status */}
           <div className="flex flex-col space-y-1 w-full">
-            <label htmlFor="status">Category Status</label>
+            <label htmlFor="status">
+              Category Status
+            </label>
+
             <select
               value={status}
               name="status"
-              onChange={(e) => setStatus(e.target.value)}
+              onChange={(e) =>
+                setStatus(e.target.value)
+              }
               className="px-4 py-2 border focus:outline-none"
               id="status"
             >
-              <option name="status" value="Active">
+              <option value="Active">
                 Active
               </option>
-              <option name="status" value="Disabled">
+
+              <option value="Disabled">
                 Disabled
               </option>
             </select>
           </div>
+
+          {/* Submit */}
           <div className="flex flex-col space-y-1 w-full pb-4 md:pb-6">
             <button
               style={{ background: "#303031" }}
-              onClick={(e) => submitForm()}
-              className="rounded-full bg-gray-800 text-gray-100 text-lg font-medium py-2"
+              onClick={submitForm}
+              disabled={data.loading}
+              className="rounded-full text-gray-100 text-lg font-medium py-2 disabled:opacity-50"
             >
-              Create category
+              {data.loading
+                ? "Updating..."
+                : "Update category"}
             </button>
           </div>
+
         </div>
       </div>
     </Fragment>

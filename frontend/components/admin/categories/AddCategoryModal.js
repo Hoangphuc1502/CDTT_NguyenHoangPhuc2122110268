@@ -1,13 +1,11 @@
+"use client";
+
 import React, { Fragment, useContext, useState } from "react";
 import { CategoryContext } from "./index";
-import { createCategory, getAllCategory } from "./FetchApi";
+import CategoryService from "@/services/CategoryService";
 
-const AddCategoryModal = (props) => {
+const AddCategoryModal = () => {
   const { data, dispatch } = useContext(CategoryContext);
-
-  const alert = (msg, type) => (
-    <div className={`bg-${type}-200 py-2 px-4 w-full`}>{msg}</div>
-  );
 
   const [fData, setFdata] = useState({
     cName: "",
@@ -18,48 +16,105 @@ const AddCategoryModal = (props) => {
     error: false,
   });
 
+  const alert = (msg, type) => (
+    <div
+      className={`${
+        type === "red" ? "bg-red-200" : "bg-green-200"
+      } py-2 px-4 w-full`}
+    >
+      {msg}
+    </div>
+  );
+
   const fetchData = async () => {
-    let responseData = await getAllCategory();
-    if (responseData.Categories) {
-      dispatch({
-        type: "fetchCategoryAndChangeState",
-        payload: responseData.Categories,
-      });
-    }
-  };
-
-  if (fData.error || fData.success) {
-    setTimeout(() => {
-      setFdata({ ...fData, success: false, error: false });
-    }, 2000);
-  }
-
-  const submitForm = async (e) => {
-    dispatch({ type: "loading", payload: true });
-    // Reset and prevent the form
-    e.preventDefault();
-    e.target.reset();
-
-    if (!fData.cImage) {
-      dispatch({ type: "loading", payload: false });
-      return setFdata({ ...fData, error: "Please upload a category image" });
-    }
-
     try {
-      let responseData = await createCategory(fData);
-      if (responseData.success) {
-        fetchData();
-        setFdata({ ...fData, success: responseData.success });
-        dispatch({ type: "loading", payload: false });
-      } else if (responseData.error) {
-        setFdata({ ...fData, success: false, error: responseData.error });
-        dispatch({ type: "loading", payload: false });
-        setTimeout(() => {
-          return setFdata({ ...fData, error: false, success: false });
-        }, 2000);
+      const responseData = await CategoryService.getAllCategory();
+
+      if (responseData?.Categories) {
+        dispatch({
+          type: "fetchCategoryAndChangeState",
+          payload: responseData.Categories,
+        });
       }
     } catch (error) {
       console.log(error);
+    }
+  };
+
+  const submitForm = async (e) => {
+    e.preventDefault();
+
+    dispatch({
+      type: "loading",
+      payload: true,
+    });
+
+    if (!fData.cImage) {
+      dispatch({
+        type: "loading",
+        payload: false,
+      });
+
+      setFdata({
+        ...fData,
+        error: "Please upload a category image",
+      });
+
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+
+      formData.append("cName", fData.cName);
+      formData.append("cDescription", fData.cDescription);
+      formData.append("cImage", fData.cImage);
+      formData.append("cStatus", fData.cStatus);
+
+      const responseData =
+        await CategoryService.createCategory(formData);
+
+      if (responseData?.success) {
+        await fetchData();
+
+        setFdata({
+          cName: "",
+          cDescription: "",
+          cImage: "",
+          cStatus: "Active",
+          success: responseData.success,
+          error: false,
+        });
+
+        dispatch({
+          type: "loading",
+          payload: false,
+        });
+      } else {
+        setFdata({
+          ...fData,
+          success: false,
+          error: responseData?.error || "Create category failed",
+        });
+
+        dispatch({
+          type: "loading",
+          payload: false,
+        });
+      }
+    } catch (error) {
+      console.log(error);
+
+      setFdata({
+        ...fData,
+        success: false,
+        error: "Something went wrong",
+      });
+
+      dispatch({
+        type: "loading",
+        payload: false,
+      });
     }
   };
 
@@ -67,29 +122,37 @@ const AddCategoryModal = (props) => {
     <Fragment>
       {/* Black Overlay */}
       <div
-        onClick={(e) => dispatch({ type: "addCategoryModal", payload: false })}
+        onClick={() =>
+          dispatch({
+            type: "addCategoryModal",
+            payload: false,
+          })
+        }
         className={`${
           data.addCategoryModal ? "" : "hidden"
         } fixed top-0 left-0 z-30 w-full h-full bg-black opacity-50`}
       />
-      {/* End Black Overlay */}
 
-      {/* Modal Start */}
+      {/* Modal */}
       <div
         className={`${
           data.addCategoryModal ? "" : "hidden"
-        } fixed inset-0 m-4  flex items-center z-30 justify-center`}
+        } fixed inset-0 m-4 flex items-center z-30 justify-center`}
       >
-        <div className="relative bg-white w-12/12 md:w-3/6 shadow-lg flex flex-col items-center space-y-4  overflow-y-auto px-4 py-4 md:px-8">
+        <div className="relative bg-white w-full md:w-3/6 shadow-lg flex flex-col items-center space-y-4 overflow-y-auto px-4 py-4 md:px-8">
+
           <div className="flex items-center justify-between w-full pt-4">
             <span className="text-left font-semibold text-2xl tracking-wider">
               Add Category
             </span>
-            {/* Close Modal */}
+
             <span
               style={{ background: "#303031" }}
-              onClick={(e) =>
-                dispatch({ type: "addCategoryModal", payload: false })
+              onClick={() =>
+                dispatch({
+                  type: "addCategoryModal",
+                  payload: false,
+                })
               }
               className="cursor-pointer text-gray-100 py-2 px-2 rounded-full"
             >
@@ -98,7 +161,6 @@ const AddCategoryModal = (props) => {
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
               >
                 <path
                   strokeLinecap="round"
@@ -109,12 +171,25 @@ const AddCategoryModal = (props) => {
               </svg>
             </span>
           </div>
-          {fData.error ? alert(fData.error, "red") : ""}
-          {fData.success ? alert(fData.success, "green") : ""}
-          <form className="w-full" onSubmit={(e) => submitForm(e)}>
+
+          {fData.error
+            ? alert(fData.error, "red")
+            : null}
+
+          {fData.success
+            ? alert(fData.success, "green")
+            : null}
+
+          <form
+            className="w-full"
+            onSubmit={submitForm}
+          >
+            {/* Category Name */}
             <div className="flex flex-col space-y-1 w-full py-4">
-              <label htmlFor="name">Category Name</label>
+              <label>Category Name</label>
+
               <input
+                value={fData.cName}
                 onChange={(e) =>
                   setFdata({
                     ...fData,
@@ -123,14 +198,17 @@ const AddCategoryModal = (props) => {
                     cName: e.target.value,
                   })
                 }
-                value={fData.cName}
                 className="px-4 py-2 border focus:outline-none"
                 type="text"
               />
             </div>
+
+            {/* Description */}
             <div className="flex flex-col space-y-1 w-full">
-              <label htmlFor="description">Category Description</label>
+              <label>Category Description</label>
+
               <textarea
+                value={fData.cDescription}
                 onChange={(e) =>
                   setFdata({
                     ...fData,
@@ -139,35 +217,36 @@ const AddCategoryModal = (props) => {
                     cDescription: e.target.value,
                   })
                 }
-                value={fData.cDescription}
                 className="px-4 py-2 border focus:outline-none"
-                name="description"
-                id="description"
-                cols={5}
                 rows={5}
               />
             </div>
-            {/* Image Field & function */}
+
+            {/* Image */}
             <div className="flex flex-col space-y-1 w-full">
-              <label htmlFor="name">Category Image</label>
+              <label>Category Image</label>
+
               <input
                 accept=".jpg, .jpeg, .png"
-                onChange={(e) => {
+                onChange={(e) =>
                   setFdata({
                     ...fData,
                     success: false,
                     error: false,
-                    cImage: e.target.files[0],
-                  });
-                }}
+                    cImage: e.target.files?.[0] || "",
+                  })
+                }
                 className="px-4 py-2 border focus:outline-none"
                 type="file"
               />
             </div>
+
+            {/* Status */}
             <div className="flex flex-col space-y-1 w-full">
-              <label htmlFor="status">Category Status</label>
+              <label>Category Status</label>
+
               <select
-                name="status"
+                value={fData.cStatus}
                 onChange={(e) =>
                   setFdata({
                     ...fData,
@@ -177,23 +256,28 @@ const AddCategoryModal = (props) => {
                   })
                 }
                 className="px-4 py-2 border focus:outline-none"
-                id="status"
               >
-                <option name="status" value="Active">
+                <option value="Active">
                   Active
                 </option>
-                <option name="status" value="Disabled">
+
+                <option value="Disabled">
                   Disabled
                 </option>
               </select>
             </div>
+
+            {/* Submit */}
             <div className="flex flex-col space-y-1 w-full pb-4 md:pb-6 mt-4">
               <button
                 style={{ background: "#303031" }}
                 type="submit"
-                className="bg-gray-800 text-gray-100 rounded-full text-lg font-medium py-2"
+                disabled={data.loading}
+                className="text-gray-100 rounded-full text-lg font-medium py-2"
               >
-                Create category
+                {data.loading
+                  ? "Creating..."
+                  : "Create category"}
               </button>
             </div>
           </form>
