@@ -1,8 +1,15 @@
-import React, { Fragment, useContext, useEffect } from "react";
+"use client";
+
+import React, {
+  Fragment,
+  useContext,
+  useEffect,
+} from "react";
+
 import { DashboardContext } from "./";
 import { GetAllData } from "./Action";
 
-const DashboardCard = (props) => {
+const DashboardCard = () => {
   const { data, dispatch } = useContext(DashboardContext);
 
   useEffect(() => {
@@ -13,7 +20,10 @@ const DashboardCard = (props) => {
   return (
     <Fragment>
       {/* Card Start */}
+
       <div className="m-4 grid grid-cols-1 md:grid-cols-4 row-gap-4 col-gap-4">
+
+        {/* Customers */}
         <div className="flex flex-col justify-center items-center col-span-1 bg-white p-6 shadow-lg hover:shadow-none cursor-pointer transition-all duration-300 ease-in border-b-4 border-opacity-0 hover:border-opacity-100 border-indigo-200">
           <div className="bg-indigo-200 p-2 cursor-pointer rounded-full">
             <svg
@@ -31,12 +41,18 @@ const DashboardCard = (props) => {
               />
             </svg>
           </div>
+
           <div className="text-2xl font-semibold">
             {data ? data.totalData.Users : 0}
           </div>
-          <div className="text-lg font-medium">Customers</div>
+
+          <div className="text-lg font-medium">
+            Customers
+          </div>
+
           <div className="flex items-center space-x-1 text-green-500">
             <span>7%</span>
+
             <span>
               <svg
                 className="w-3 h-3"
@@ -55,6 +71,8 @@ const DashboardCard = (props) => {
             </span>
           </div>
         </div>
+
+        {/* Orders */}
         <div className="flex flex-col justify-center items-center col-span-1 bg-white p-6 shadow-lg hover:shadow-none cursor-pointer transition-all duration-300 ease-in border-b-4 border-opacity-0 hover:border-opacity-100 border-red-200">
           <div className="bg-red-200 p-2 cursor-pointer rounded-full">
             <svg
@@ -72,12 +90,18 @@ const DashboardCard = (props) => {
               />
             </svg>
           </div>
+
           <div className="text-2xl font-semibold">
             {data ? data.totalData.Orders : 0}
           </div>
-          <div className="text-lg font-medium">Orders</div>
+
+          <div className="text-lg font-medium">
+            Orders
+          </div>
+
           <div className="flex items-center space-x-1 text-green-500">
             <span>10%</span>
+
             <span>
               <svg
                 className="w-3 h-3"
@@ -96,6 +120,8 @@ const DashboardCard = (props) => {
             </span>
           </div>
         </div>
+
+        {/* Products */}
         <div className="flex flex-col justify-center items-center col-span-1 bg-white p-6 shadow-lg hover:shadow-none cursor-pointer transition-all duration-300 ease-in border-b-4 border-opacity-0 hover:border-opacity-100 border-green-200">
           <div className="bg-green-200 p-2 cursor-pointer rounded-full">
             <svg
@@ -111,11 +137,17 @@ const DashboardCard = (props) => {
               />
             </svg>
           </div>
+
           <div className="text-2xl font-semibold">
             {data ? data.totalData.Products : 0}
           </div>
-          <div className="text-lg font-medium">Product</div>
+
+          <div className="text-lg font-medium">
+            Product
+          </div>
         </div>
+
+        {/* Categories */}
         <div className="flex flex-col justify-center items-center col-span-1 bg-white p-6 shadow-lg hover:shadow-none cursor-pointer transition-all duration-300 ease-in border-b-4 border-opacity-0 hover:border-opacity-100 border-orange-200">
           <div className="bg-orange-200 p-2 cursor-pointer rounded-full">
             <svg
@@ -133,12 +165,18 @@ const DashboardCard = (props) => {
               />
             </svg>
           </div>
+
           <div className="text-2xl font-semibold">
             {data ? data.totalData.Categories : 0}
           </div>
-          <div className="text-lg font-medium">Categories</div>
+
+          <div className="text-lg font-medium">
+            Categories
+          </div>
         </div>
+
       </div>
+
       {/* End Card */}
     </Fragment>
   );

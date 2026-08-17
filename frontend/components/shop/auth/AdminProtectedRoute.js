@@ -1,19 +1,32 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
-import { isAuthenticate, isAdmin } from "./fetchApi";
+import { useEffect, useState } from "react";
+import AuthService from "@/services/AuthService";
 
 export default function AdminProtectedRoute({ children }) {
   const router = useRouter();
+  const [checking, setChecking] = useState(true);
+  const [authorized, setAuthorized] = useState(false);
 
   useEffect(() => {
-    if (!isAuthenticate() || !isAdmin()) {
+    const authenticated = AuthService.AuthService.isAuthenticate();
+    const admin = AuthService.AuthService.isAdmin();
+
+    if (!authenticated || !admin) {
       router.replace("/user/profile");
+      return;
     }
+
+    setAuthorized(true);
+    setChecking(false);
   }, [router]);
 
-  if (!isAuthenticate() || !isAdmin()) {
+  if (checking) {
+    return null;
+  }
+
+  if (!authorized) {
     return null;
   }
 

@@ -1,6 +1,6 @@
 import React, { Fragment } from "react";
 
-const SearchFilter = (props) => {
+const SearchFilter = () => {
   return (
     <Fragment>
       <div className="w-full my-4 md:my-0 flex items-start justify-end">
@@ -19,16 +19,18 @@ const SearchFilter = (props) => {
               />
             </svg>
           </span>
+
           <input
             placeholder="Find orders..."
             className="w-full py-2 px-2 focus:outline-none"
             type="text"
           />
+
           <input
             style={{ background: "#303031" }}
-            className="py-2 px-4 focus:outline-none rounded-r cursor-pointer capitalize  text-gray-100"
+            className="py-2 px-4 focus:outline-none rounded-r cursor-pointer capitalize text-gray-100"
             type="submit"
-            defaultValue="search"
+            value="search"
           />
         </div>
       </div>

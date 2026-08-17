@@ -1,24 +1,36 @@
-import React from "react";
-import "bootstrap/dist/css/bootstrap.min.css";
+import Link from "next/link";
 
 const Contact = () => {
   return (
     <div className="container mt-5 content">
-      <h1 className="mb-4 text-center">Liên hệ với chúng tôi</h1>
+      <h1 className="mb-4 text-center">
+        Liên hệ với chúng tôi
+      </h1>
+
       <div className="row">
         {/* Thông tin liên hệ */}
         <div className="col-md-6 mb-4">
           <h5>Thông tin liên hệ</h5>
+
           <p>
-            <strong>Địa chỉ:</strong> 123 Đường ABC, Quận 1, TP. Hồ Chí Minh
+            <strong>Địa chỉ:</strong>{" "}
+            123 Đường ABC, Quận 1, TP. Hồ Chí Minh
           </p>
+
           <p>
-            <strong>Điện thoại:</strong> (0123) 456-789
+            <strong>Điện thoại:</strong>{" "}
+            (0123) 456-789
           </p>
+
           <p>
-            <strong>Email:</strong> contact@Sport.com
+            <strong>Email:</strong>{" "}
+            contact@Sport.com
           </p>
-          <h5 className="mt-4">Vị trí của chúng tôi</h5>
+
+          <h5 className="mt-4">
+            Vị trí của chúng tôi
+          </h5>
+
           <div className="map-container">
             <iframe
               title="Google Maps"
@@ -26,42 +38,64 @@ const Contact = () => {
               width="100%"
               height="300"
               style={{ border: 0 }}
-              allowFullScreen=""
+              allowFullScreen
               loading="lazy"
-            ></iframe>
+            />
           </div>
         </div>
 
         {/* Nội dung bổ sung */}
         <div className="col-md-6">
-  <h5>Dụng cụ cầu lông</h5>
-<p>
-  Dụng cụ cầu lông là yếu tố quan trọng giúp người chơi nâng cao hiệu suất thi đấu và bảo vệ sức khỏe trong quá trình tập luyện. Chúng tôi chuyên cung cấp các sản phẩm cầu lông chất lượng cao như vợt cầu lông, quần áo cầu lông, giày cầu lông và giày thể thao, phù hợp cho cả người mới chơi lẫn vận động viên chuyên nghiệp.
-</p>
-<ul>
-  <li>
-    <strong>Chất lượng đảm bảo:</strong> Sản phẩm được lựa chọn từ các thương hiệu uy tín, đảm bảo độ bền, sự thoải mái và an toàn khi sử dụng.
-  </li>
-  <li>
-    <strong>Giá cả cạnh tranh:</strong> Mức giá hợp lý, phù hợp với nhiều phân khúc khách hàng, giúp bạn dễ dàng trang bị đầy đủ dụng cụ cầu lông.
-  </li>
-  <li>
-    <strong>Tư vấn tận tâm:</strong> Đội ngũ tư vấn am hiểu cầu lông sẵn sàng hỗ trợ bạn chọn vợt, giày và trang phục phù hợp với lối chơi và thể trạng.
-  </li>
-</ul>
-<p>
-  Hãy khám phá các sản phẩm cầu lông tại cửa hàng của chúng tôi để nâng cao trải nghiệm tập luyện và thi đấu. Đừng bỏ lỡ những chương trình ưu đãi hấp dẫn giúp bạn sở hữu dụng cụ cầu lông chất lượng với giá tốt nhất.
-</p>
+          <h5>Dụng cụ cầu lông</h5>
 
+          <p>
+            Dụng cụ cầu lông là yếu tố quan trọng giúp
+            người chơi nâng cao hiệu suất thi đấu và bảo
+            vệ sức khỏe trong quá trình tập luyện. Chúng
+            tôi chuyên cung cấp các sản phẩm cầu lông chất
+            lượng cao như vợt cầu lông, quần áo cầu lông,
+            giày cầu lông và giày thể thao, phù hợp cho cả
+            người mới chơi lẫn vận động viên chuyên nghiệp.
+          </p>
 
-  <a
-    href="/san-pham"
-    className="btn btn-primary mt-3"
-  >
-    Khám phá sản phẩm
-  </a>
-</div>
+          <ul>
+            <li>
+              <strong>Chất lượng đảm bảo:</strong>{" "}
+              Sản phẩm được lựa chọn từ các thương hiệu uy
+              tín, đảm bảo độ bền, sự thoải mái và an toàn
+              khi sử dụng.
+            </li>
 
+            <li>
+              <strong>Giá cả cạnh tranh:</strong>{" "}
+              Mức giá hợp lý, phù hợp với nhiều phân khúc
+              khách hàng, giúp bạn dễ dàng trang bị đầy đủ
+              dụng cụ cầu lông.
+            </li>
+
+            <li>
+              <strong>Tư vấn tận tâm:</strong>{" "}
+              Đội ngũ tư vấn am hiểu cầu lông sẵn sàng hỗ
+              trợ bạn chọn vợt, giày và trang phục phù hợp
+              với lối chơi và thể trạng.
+            </li>
+          </ul>
+
+          <p>
+            Hãy khám phá các sản phẩm cầu lông tại cửa hàng
+            của chúng tôi để nâng cao trải nghiệm tập luyện
+            và thi đấu. Đừng bỏ lỡ những chương trình ưu đãi
+            hấp dẫn giúp bạn sở hữu dụng cụ cầu lông chất
+            lượng với giá tốt nhất.
+          </p>
+
+          <Link
+            href="/san-pham"
+            className="btn btn-primary mt-3"
+          >
+            Khám phá sản phẩm
+          </Link>
+        </div>
       </div>
     </div>
   );

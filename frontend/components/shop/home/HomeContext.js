@@ -1,3 +1,5 @@
+"use client";
+
 export const homeState = {
   categoryListDropdown: false,
   filterListDropdown: false,
@@ -16,6 +18,7 @@ export const homeReducer = (state, action) => {
         filterListDropdown: false,
         searchDropdown: false,
       };
+
     case "filterListDropdown":
       return {
         ...state,
@@ -23,6 +26,7 @@ export const homeReducer = (state, action) => {
         filterListDropdown: action.payload,
         searchDropdown: false,
       };
+
     case "searchDropdown":
       return {
         ...state,
@@ -30,36 +34,36 @@ export const homeReducer = (state, action) => {
         filterListDropdown: false,
         searchDropdown: action.payload,
       };
+
     case "setProducts":
       return {
         ...state,
         products: action.payload,
       };
+
     case "searchHandleInReducer":
       return {
         ...state,
         products:
-          action.productArray &&
-          action.productArray.filter((item) => {
-            if (
-              item.pName.toUpperCase().indexOf(action.payload.toUpperCase()) !==
-              -1
-            ) {
-              return item;
-            }
-            return null;
-          }),
+          action.productArray?.filter((item) =>
+            item.pName
+              ?.toUpperCase()
+              .includes(action.payload.toUpperCase())
+          ) || [],
       };
+
     case "loading":
       return {
         ...state,
         loading: action.payload,
       };
+
     case "sliderImages":
       return {
         ...state,
         sliderImages: action.payload,
       };
+
     default:
       return state;
   }

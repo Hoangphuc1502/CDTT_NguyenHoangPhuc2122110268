@@ -1,30 +1,24 @@
 export const subTotal = (id, price) => {
-  let subTotalCost = 0;
-  let carts = JSON.parse(localStorage.getItem("cart"));
-  carts.forEach((item) => {
-    if (item.id === id) {
-      subTotalCost = item.quantitiy * price;
-    }
-  });
-  return subTotalCost;
+  const carts = JSON.parse(localStorage.getItem("cart")) || [];
+
+  const item = carts.find((item) => item.id === id);
+
+  return item ? item.quantitiy * price : 0;
 };
 
 export const quantity = (id) => {
-  let product = 0;
-  let carts = JSON.parse(localStorage.getItem("cart"));
-  carts.forEach((item) => {
-    if (item.id === id) {
-      product = item.quantitiy;
-    }
-  });
-  return product;
+  const carts = JSON.parse(localStorage.getItem("cart")) || [];
+
+  const item = carts.find((item) => item.id === id);
+
+  return item ? item.quantitiy : 0;
 };
 
 export const totalCost = () => {
-  let totalCost = 0;
-  let carts = JSON.parse(localStorage.getItem("cart"));
-  carts.forEach((item) => {
-    totalCost += item.quantitiy * item.price;
-  });
-  return totalCost;
+  const carts = JSON.parse(localStorage.getItem("cart")) || [];
+
+  return carts.reduce(
+    (total, item) => total + item.quantitiy * item.price,
+    0
+  );
 };

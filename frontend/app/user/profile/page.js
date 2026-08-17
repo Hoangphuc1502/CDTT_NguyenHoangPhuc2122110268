@@ -1,12 +1,10 @@
-"use client";
+import UserProfile from "@/components/dashboarduser/UserProfile";
+import Layout from "@/components/dashboarduser/Layout";
 
-import ProtectedRoute from "../../../components/shop/auth/ProtectedRoute";
-import { UserProfile } from "../../../components/shop/dashboardUser";
-
-export default function Page() {
+export default function ProfilePage() {
   return (
-    <ProtectedRoute>
+    <Layout>
       <UserProfile />
-    </ProtectedRoute>
+    </Layout>
   );
 }

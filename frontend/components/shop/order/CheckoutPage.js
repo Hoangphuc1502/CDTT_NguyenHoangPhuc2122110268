@@ -1,13 +1,9 @@
-import React, { Fragment } from "react";
-import Layout from "../layout";
+"use client";
+
 import { CheckoutComponent } from "./CheckoutProducts";
 
-const CheckoutPage = (props) => {
-  return (
-    <Fragment>
-      <Layout children={<CheckoutComponent />} />
-    </Fragment>
-  );
+const CheckoutPage = () => {
+  return <CheckoutComponent />;
 };
 
 export default CheckoutPage;

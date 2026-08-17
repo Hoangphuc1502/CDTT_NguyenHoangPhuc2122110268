@@ -1,9 +1,16 @@
-import React, { Fragment, useState, useContext } from "react";
-import Layout from "./Layout";
+"use client";
+
+import React, {
+  Fragment,
+  useState,
+  useContext,
+  useEffect,
+} from "react";
+
 import { handleChangePassword } from "./Action";
 import { DashboardUserContext } from "./Layout";
 
-const SettingComponent = () => {
+const SettingUser = () => {
   const { data, dispatch } = useContext(DashboardUserContext);
 
   const [fData, setFdata] = useState({
@@ -16,15 +23,24 @@ const SettingComponent = () => {
     type: "password",
   });
 
-  if (fData.success || fData.error) {
-    setTimeout(() => {
-      setFdata({ ...fData, success: false, error: false });
-    }, 1500);
-  }
+  // Tự động xóa thông báo sau 1.5 giây
+  useEffect(() => {
+    if (fData.success || fData.error) {
+      const timer = setTimeout(() => {
+        setFdata((prev) => ({
+          ...prev,
+          success: false,
+          error: false,
+        }));
+      }, 1500);
+
+      return () => clearTimeout(timer);
+    }
+  }, [fData.success, fData.error]);
 
   if (data.loading) {
     return (
-      <div className="w-full md:w-9/12 flex items-center justify-center ">
+      <div className="w-full md:w-9/12 flex items-center justify-center">
         <svg
           className="w-12 h-12 animate-spin text-gray-600"
           fill="none"
@@ -37,11 +53,12 @@ const SettingComponent = () => {
             strokeLinejoin="round"
             strokeWidth="2"
             d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-          ></path>
+          />
         </svg>
       </div>
     );
   }
+
   return (
     <Fragment>
       <div className="flex flex-col w-full my-4 md:my-0 md:w-9/12 md:px-8">
@@ -49,34 +66,45 @@ const SettingComponent = () => {
           <div className="py-4 px-4 text-lg font-semibold border-t-2 border-yellow-700">
             Change Password
           </div>
+
           <hr />
+
           <div className="py-4 px-4 md:px-8 lg:px-16 flex flex-col space-y-4">
-            {fData.success ? (
+            {/* Success */}
+            {fData.success && (
               <div className="bg-green-200 px-4 py-2 rounded">
                 {fData.success}
               </div>
-            ) : (
-              ""
             )}
-            {fData.error ? (
-              <div className="bg-red-200 px-4 py-2 rounded">{fData.error}</div>
-            ) : (
-              ""
+
+            {/* Error */}
+            {fData.error && (
+              <div className="bg-red-200 px-4 py-2 rounded">
+                {fData.error}
+              </div>
             )}
+
+            {/* Old Password */}
             <div className="flex flex-col space-y-2">
               <label htmlFor="oldPassword">Old Password</label>
+
               <div className="relative">
                 <input
                   onChange={(e) =>
-                    setFdata({ ...fData, oldPassword: e.target.value })
+                    setFdata({
+                      ...fData,
+                      oldPassword: e.target.value,
+                    })
                   }
                   value={fData.oldPassword}
                   type={fData.type}
                   id="oldPassword"
                   className="z-10 border px-4 py-2 w-full focus:outline-none"
                 />
+
+                {/* Show password */}
                 <span
-                  onClick={(e) =>
+                  onClick={() =>
                     setFdata({
                       ...fData,
                       passwordView: false,
@@ -92,7 +120,6 @@ const SettingComponent = () => {
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
                   >
                     <path
                       strokeLinecap="round"
@@ -100,6 +127,7 @@ const SettingComponent = () => {
                       strokeWidth={2}
                       d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
                     />
+
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -108,9 +136,15 @@ const SettingComponent = () => {
                     />
                   </svg>
                 </span>
+
+                {/* Hide password */}
                 <span
-                  onClick={(e) =>
-                    setFdata({ ...fData, passwordView: true, type: "text" })
+                  onClick={() =>
+                    setFdata({
+                      ...fData,
+                      passwordView: true,
+                      type: "text",
+                    })
                   }
                   className={`${
                     !fData.passwordView ? "" : "hidden"
@@ -121,7 +155,6 @@ const SettingComponent = () => {
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
                   >
                     <path
                       strokeLinecap="round"
@@ -133,11 +166,17 @@ const SettingComponent = () => {
                 </span>
               </div>
             </div>
+
+            {/* New Password */}
             <div className="flex flex-col space-y-2">
               <label htmlFor="newPassword">New Password</label>
+
               <input
                 onChange={(e) =>
-                  setFdata({ ...fData, newPassword: e.target.value })
+                  setFdata({
+                    ...fData,
+                    newPassword: e.target.value,
+                  })
                 }
                 value={fData.newPassword}
                 type="password"
@@ -145,11 +184,19 @@ const SettingComponent = () => {
                 className="border px-4 py-2 w-full focus:outline-none"
               />
             </div>
+
+            {/* Confirm Password */}
             <div className="flex flex-col space-y-2">
-              <label htmlFor="confirmPassword">Confirm Password</label>
+              <label htmlFor="confirmPassword">
+                Confirm Password
+              </label>
+
               <input
                 onChange={(e) =>
-                  setFdata({ ...fData, confirmPassword: e.target.value })
+                  setFdata({
+                    ...fData,
+                    confirmPassword: e.target.value,
+                  })
                 }
                 value={fData.confirmPassword}
                 type="password"
@@ -157,24 +204,21 @@ const SettingComponent = () => {
                 className="border px-4 py-2 w-full focus:outline-none"
               />
             </div>
-            <div
-              onClick={(e) => handleChangePassword(fData, setFdata, dispatch)}
+
+            {/* Button */}
+            <button
+              onClick={() =>
+                handleChangePassword(fData, setFdata, dispatch)
+              }
+              type="button"
               style={{ background: "#303031" }}
               className="w-full text-center cursor-pointer px-4 py-2 text-gray-100"
             >
               Change password
-            </div>
+            </button>
           </div>
         </div>
       </div>
-    </Fragment>
-  );
-};
-
-const SettingUser = (props) => {
-  return (
-    <Fragment>
-      <Layout children={<SettingComponent />} />
     </Fragment>
   );
 };

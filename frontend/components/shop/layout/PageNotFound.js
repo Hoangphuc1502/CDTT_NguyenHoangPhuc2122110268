@@ -1,7 +1,4 @@
-import React from "react";
-import Layout from "./index";
-
-const PageNotFoundComponent = (props) => {
+const PageNotFound = () => {
   return (
     <div className="flex flex-col items-center justify-center my-32">
       <span>
@@ -20,15 +17,12 @@ const PageNotFoundComponent = (props) => {
           />
         </svg>
       </span>
+
       <span className="text-center text-gray-700 text-4xl font-bold tracking-widest">
-        404 not found
+        404 Not Found
       </span>
     </div>
   );
-};
-
-const PageNotFound = (props) => {
-  return <Layout children={<PageNotFoundComponent />} />;
 };
 
 export default PageNotFound;

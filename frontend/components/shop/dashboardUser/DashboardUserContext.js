@@ -11,16 +11,19 @@ export const dashboardUserReducer = (state, action) => {
         ...state,
         userDetails: action.payload,
       };
+
     case "OrderByUser":
       return {
         ...state,
         OrderByUser: action.payload,
       };
+
     case "loading":
       return {
         ...state,
         loading: action.payload,
       };
+
     default:
       return state;
   }

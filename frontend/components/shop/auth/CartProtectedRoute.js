@@ -1,24 +1,44 @@
-import React from "react";
-import { Route, Redirect } from "react-router-dom";
-import { isAuthenticate } from "./fetchApi";
+"use client";
 
-const CartProtectedRoute = ({ component: Component, ...rest }) => (
-  <Route
-    {...rest}
-    render={(props) =>
-      JSON.parse(localStorage.getItem("cart")).length !== 0 &&
-      isAuthenticate() ? (
-        <Component {...props} />
-      ) : (
-        <Redirect
-          to={{
-            pathname: "/",
-            state: { from: props.location },
-          }}
-        />
-      )
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import AuthService from "@/services/AuthService";
+
+export default function CartProtectedRoute({ children }) {
+  const router = useRouter();
+
+  const [checking, setChecking] = useState(true);
+  const [authorized, setAuthorized] = useState(false);
+
+  useEffect(() => {
+    const authenticated = AuthService.AuthService.isAuthenticate();
+
+    let cart = [];
+
+    try {
+      const cartData = localStorage.getItem("cart");
+      cart = cartData ? JSON.parse(cartData) : [];
+    } catch (error) {
+      console.error("Cart error:", error);
+      cart = [];
     }
-  />
-);
 
-export default CartProtectedRoute;
+    if (!authenticated || !Array.isArray(cart) || cart.length === 0) {
+      router.replace("/");
+      return;
+    }
+
+    setAuthorized(true);
+    setChecking(false);
+  }, [router]);
+
+  if (checking) {
+    return null;
+  }
+
+  if (!authorized) {
+    return null;
+  }
+
+  return children;
+}

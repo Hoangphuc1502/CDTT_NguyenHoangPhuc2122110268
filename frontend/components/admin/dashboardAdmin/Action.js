@@ -1,30 +1,45 @@
-import {
-  DashboardData,
-  postUploadImage,
-  getSliderImages,
-  postDeleteImage,
-} from "./FetchApi";
-import { getAllOrder } from "../orders/FetchApi.js";
+import DashboardService from "@/services/DashboardService";
+import { getAllOrder } from "@/services/OrderService";
 
 export const GetAllData = async (dispatch) => {
-  let responseData = await DashboardData();
-  if (responseData) {
-    dispatch({ type: "totalData", payload: responseData });
+  try {
+    const responseData = await DashboardService.getDashboardData();
+
+    if (responseData) {
+      dispatch({
+        type: "totalData",
+        payload: responseData,
+      });
+    }
+  } catch (error) {
+    console.log(error);
   }
 };
 
 export const todayAllOrders = async (dispatch) => {
-  let responseData = await getAllOrder();
-  if (responseData) {
-    dispatch({ type: "totalOrders", payload: responseData });
+  try {
+    const responseData = await getAllOrder();
+
+    if (responseData) {
+      dispatch({
+        type: "totalOrders",
+        payload: responseData,
+      });
+    }
+  } catch (error) {
+    console.log(error);
   }
 };
 
 export const sliderImages = async (dispatch) => {
   try {
-    let responseData = await getSliderImages();
+    const responseData = await DashboardService.getSliderImages();
+
     if (responseData && responseData.Images) {
-      dispatch({ type: "sliderImages", payload: responseData.Images });
+      dispatch({
+        type: "sliderImages",
+        payload: responseData.Images,
+      });
     }
   } catch (error) {
     console.log(error);
@@ -32,34 +47,50 @@ export const sliderImages = async (dispatch) => {
 };
 
 export const deleteImage = async (id, dispatch) => {
-  dispatch({ type: "imageUpload", payload: true });
+  dispatch({
+    type: "imageUpload",
+    payload: true,
+  });
+
   try {
-    let responseData = await postDeleteImage(id);
+    const responseData =
+      await DashboardService.deleteSliderImage(id);
+
     if (responseData && responseData.success) {
-      setTimeout(function () {
-        sliderImages(dispatch);
-        dispatch({ type: "imageUpload", payload: false });
-      }, 1000);
+      await sliderImages(dispatch);
     }
   } catch (error) {
     console.log(error);
+  } finally {
+    dispatch({
+      type: "imageUpload",
+      payload: false,
+    });
   }
 };
 
 export const uploadImage = async (image, dispatch) => {
-  dispatch({ type: "imageUpload", payload: true });
-  let formData = new FormData();
+  dispatch({
+    type: "imageUpload",
+    payload: true,
+  });
+
+  const formData = new FormData();
   formData.append("image", image);
-  console.log(formData.get("image"));
+
   try {
-    let responseData = await postUploadImage(formData);
+    const responseData =
+      await DashboardService.uploadSliderImage(formData);
+
     if (responseData && responseData.success) {
-      setTimeout(function () {
-        dispatch({ type: "imageUpload", payload: false });
-        sliderImages(dispatch);
-      }, 1000);
+      await sliderImages(dispatch);
     }
   } catch (error) {
     console.log(error);
+  } finally {
+    dispatch({
+      type: "imageUpload",
+      payload: false,
+    });
   }
 };

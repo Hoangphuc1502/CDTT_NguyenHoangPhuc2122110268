@@ -1,8 +1,19 @@
-import React, { Fragment, useContext, useEffect } from "react";
-import { DashboardContext } from "./";
-import { uploadImage, sliderImages, deleteImage } from "./Action";
+"use client";
 
-const apiURL = process.env.REACT_APP_API_URL;
+import React, {
+  Fragment,
+  useContext,
+  useEffect,
+} from "react";
+
+import { DashboardContext } from "./";
+import {
+  uploadImage,
+  sliderImages,
+  deleteImage,
+} from "./Action";
+
+const apiURL = process.env.NEXT_PUBLIC_API_URL;
 
 const Customize = () => {
   const { data, dispatch } = useContext(DashboardContext);
@@ -12,7 +23,7 @@ const Customize = () => {
       <div className="m-4 md:w-1/2">
         {!data.uploadSliderBtn ? (
           <div
-            onClick={(e) =>
+            onClick={() =>
               dispatch({
                 type: "uploadSliderBtn",
                 payload: !data.uploadSliderBtn,
@@ -33,13 +44,13 @@ const Customize = () => {
                 clipRule="evenodd"
               />
             </svg>
+
             Customize Slider Image
           </div>
-        ) : (
-          ""
-        )}
+        ) : null}
       </div>
-      {data.uploadSliderBtn ? <UploadImageSection /> : ""}
+
+      {data.uploadSliderBtn ? <UploadImageSection /> : null}
     </Fragment>
   );
 };
@@ -48,6 +59,8 @@ const UploadImageSection = () => {
   const { data, dispatch } = useContext(DashboardContext);
 
   const uploadImageHandler = (image) => {
+    if (!image) return;
+
     uploadImage(image, dispatch);
   };
 
@@ -57,6 +70,7 @@ const UploadImageSection = () => {
         <h1 className="border-b-2 border-yellow-700 mb-4 pb-2 text-2xl font-semibold">
           Shop Slider Images
         </h1>
+
         <div className="relative flex flex-col space-y-2">
           <div
             style={{ background: "#303031" }}
@@ -75,20 +89,25 @@ const UploadImageSection = () => {
                 strokeWidth={2}
                 d="M12 6v6m0 0v6m0-6h6m-6 0H6"
               />
-            </svg>{" "}
+            </svg>
+
             <span>Upload File</span>
           </div>
+
           <input
-            onChange={(e) => uploadImageHandler(e.target.files[0])}
+            onChange={(e) =>
+              uploadImageHandler(e.target.files?.[0])
+            }
             name="image"
-            accept=".jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*"
+            accept=".jpg,.png,.jpeg,.gif,.bmp,.tif,.tiff,image/*"
             className="absolute z-10 opacity-0 bg-gray-100"
             type="file"
             id="image"
           />
         </div>
+
         <span
-          onClick={(e) =>
+          onClick={() =>
             dispatch({
               type: "uploadSliderBtn",
               payload: !data.uploadSliderBtn,
@@ -112,6 +131,7 @@ const UploadImageSection = () => {
             />
           </svg>
         </span>
+
         <AllImages />
       </div>
     </Fragment>
@@ -123,8 +143,7 @@ const AllImages = () => {
 
   useEffect(() => {
     sliderImages(dispatch);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [dispatch]);
 
   const deleteImageReq = (id) => {
     deleteImage(id, dispatch);
@@ -146,24 +165,27 @@ const AllImages = () => {
               strokeLinejoin="round"
               strokeWidth="2"
               d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-            ></path>
+            />
           </svg>
         </div>
-      ) : (
-        ""
-      )}
+      ) : null}
+
       <div className="grid grid-cols-1 md:grid md:grid-cols-2 lg:grid-cols-3 my-4">
         {data.sliderImages.length > 0 ? (
           data.sliderImages.map((item, index) => {
             return (
-              <div key={index} className="relative col-span-1 m-2 border">
+              <div
+                key={index}
+                className="relative col-span-1 m-2 border"
+              >
                 <img
                   className="w-full md:h-32 object-center object-cover"
                   src={`${apiURL}/uploads/customize/${item.slideImage}`}
                   alt="sliderImages"
                 />
+
                 <span
-                  onClick={(e) => deleteImageReq(item._id)}
+                  onClick={() => deleteImageReq(item._id)}
                   style={{ background: "#303031" }}
                   className="absolute top-0 right-0 m-1 text-white cursor-pointer rounded-full p-1"
                 >

@@ -1,13 +1,5 @@
-import React, { Fragment } from "react";
-import Layout from "../layout";
-import SingleWishProduct from "./SingleWishProduct";
+import SingleWishProduct from "@/components/shop/wishlist/SingleWishProduct";
 
-const WishList = () => {
-  return (
-    <Fragment>
-      <Layout children={<SingleWishProduct />} />
-    </Fragment>
-  );
-};
-
-export default WishList;
+export default function Page() {
+  return <SingleWishProduct />;
+}

@@ -1,41 +1,74 @@
-import React, { Fragment, useState, useEffect, useContext } from "react";
-import { useHistory } from "react-router-dom";
-import { getAllProduct } from "../../admin/products/FetchApi";
+"use client";
+
+import React, { Fragment, useContext, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+
+import ProductService from "@/services/ProductService";
 import { HomeContext } from "./index";
 import { isWishReq, unWishReq, isWish } from "./Mixins";
 
-const apiURL = process.env.REACT_APP_API_URL;
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-const SingleProduct = (props) => {
+const SingleProduct = () => {
   const { data, dispatch } = useContext(HomeContext);
   const { products } = data;
-  const history = useHistory();
 
-  /* WhisList State */
-  const [wList, setWlist] = useState(
-    JSON.parse(localStorage.getItem("wishList"))
-  );
+  const router = useRouter();
 
+  /* Wishlist State */
+  const [wList, setWlist] = useState([]);
+
+  /* =========================
+     Load wishlist
+  ========================= */
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const wishlist = localStorage.getItem("wishList");
+
+      setWlist(wishlist ? JSON.parse(wishlist) : []);
+    }
+  }, []);
+
+  /* =========================
+     Load products
+  ========================= */
   useEffect(() => {
     fetchData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchData = async () => {
-    dispatch({ type: "loading", payload: true });
+    dispatch({
+      type: "loading",
+      payload: true,
+    });
+
     try {
-      let responseData = await getAllProduct();
-      setTimeout(() => {
-        if (responseData && responseData.Products) {
-          dispatch({ type: "setProducts", payload: responseData.Products });
-          dispatch({ type: "loading", payload: false });
-        }
-      }, 500);
+      const responseData = await ProductService.getAllProduct();
+
+      if (responseData && responseData.Products) {
+        dispatch({
+          type: "setProducts",
+          payload: responseData.Products,
+        });
+      }
+
+      dispatch({
+        type: "loading",
+        payload: false,
+      });
     } catch (error) {
-      console.log(error);
+      console.error("Get products error:", error);
+
+      dispatch({
+        type: "loading",
+        payload: false,
+      });
     }
   };
 
+  /* =========================
+     Loading
+  ========================= */
   if (data.loading) {
     return (
       <div className="col-span-2 md:col-span-3 lg:col-span-4 flex items-center justify-center py-24">
@@ -44,43 +77,49 @@ const SingleProduct = (props) => {
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
         >
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
             strokeWidth="2"
             d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-          ></path>
+          />
         </svg>
       </div>
     );
   }
+
   return (
     <Fragment>
       {products && products.length > 0 ? (
         products.map((item, index) => {
           return (
-            <Fragment key={index}>
+            <Fragment key={item._id || index}>
               <div className="relative col-span-1 m-2">
+
+                {/* Product Image */}
                 <img
-                  onClick={(e) => history.push(`/products/${item._id}`)}
+                  onClick={() => router.push(`/products/${item._id}`)}
                   className="w-full object-cover object-center cursor-pointer"
-                  src={`${apiURL}/uploads/products/${item.pImages[0]}`}
-                  alt=""
+                  src={`${API_URL}/uploads/products/${item.pImages?.[0]}`}
+                  alt={item.pName || "Product"}
                 />
+
+                {/* Product Name + Rating */}
                 <div className="flex items-center justify-between mt-2">
+
                   <div className="text-gray-600 font-light truncate">
                     {item.pName}
                   </div>
+
                   <div className="flex items-center space-x-1">
+
                     <span>
                       <svg
                         className="w-4 h-4 fill-current text-yellow-700"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg"
                       >
                         <path
                           strokeLinecap="round"
@@ -90,23 +129,35 @@ const SingleProduct = (props) => {
                         />
                       </svg>
                     </span>
+
                     <span className="text-gray-700">
-                      {item.pRatingsReviews.length}
+                      {item.pRatingsReviews
+                        ? item.pRatingsReviews.length
+                        : 0}
                     </span>
+
                   </div>
                 </div>
-                <div>${item.pPrice}.00</div>
-                {/* WhisList Logic  */}
+
+                {/* Price */}
+                <div>
+                  ${item.pPrice}.00
+                </div>
+
+                {/* Wishlist */}
                 <div className="absolute top-0 right-0 mx-2 my-2 md:mx-4">
+
+                  {/* Add Wishlist */}
                   <svg
-                    onClick={(e) => isWishReq(e, item._id, setWlist)}
+                    onClick={(e) =>
+                      isWishReq(e, item._id, setWlist)
+                    }
                     className={`${
-                      isWish(item._id, wList) && "hidden"
+                      isWish(item._id, wList) ? "hidden" : ""
                     } w-5 h-5 md:w-6 md:h-6 cursor-pointer text-yellow-700 transition-all duration-300 ease-in`}
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
                   >
                     <path
                       strokeLinecap="round"
@@ -115,14 +166,17 @@ const SingleProduct = (props) => {
                       d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
                     />
                   </svg>
+
+                  {/* Remove Wishlist */}
                   <svg
-                    onClick={(e) => unWishReq(e, item._id, setWlist)}
+                    onClick={(e) =>
+                      unWishReq(e, item._id, setWlist)
+                    }
                     className={`${
-                      !isWish(item._id, wList) && "hidden"
+                      !isWish(item._id, wList) ? "hidden" : ""
                     } w-5 h-5 md:w-6 md:h-6 cursor-pointer text-yellow-700 transition-all duration-300 ease-in`}
                     fill="currentColor"
                     viewBox="0 0 20 20"
-                    xmlns="http://www.w3.org/2000/svg"
                   >
                     <path
                       fillRule="evenodd"
@@ -130,8 +184,8 @@ const SingleProduct = (props) => {
                       clipRule="evenodd"
                     />
                   </svg>
+
                 </div>
-                {/* WhisList Logic End */}
               </div>
             </Fragment>
           );

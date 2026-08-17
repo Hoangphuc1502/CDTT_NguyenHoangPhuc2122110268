@@ -1,5 +1,7 @@
-import { WishList } from "../../components/shop";
+"use client";
+
+import SingleWishProduct from "@/components/shop/wishlist/SingleWishProduct";
 
 export default function Page() {
-  return <WishList />;
+  return <SingleWishProduct />;
 }
